@@ -1,4 +1,10 @@
-#pragma once
+#ifndef TYPEWISE_ALERT_H_
+#define TYPEWISE_ALERT_H_
+
+#include <stdio.h>
+#include <iostream>
+#include <sstream>
+#include <unordered_map>
 
 typedef enum {
   PASSIVE_COOLING,
@@ -12,9 +18,6 @@ typedef enum {
   TOO_HIGH
 } BreachType;
 
-BreachType inferBreach(double value, double lowerLimit, double upperLimit);
-BreachType classifyTemperatureBreach(CoolingType coolingType, double temperatureInC);
-
 typedef enum {
   TO_CONTROLLER,
   TO_EMAIL
@@ -25,8 +28,21 @@ typedef struct {
   char brand[48];
 } BatteryCharacter;
 
+#ifdef ENABLE_BREACH_STATUS
+const char* breachStatus[] = {"normal", "too low", "too high"};
+#endif
+
+BreachType inferBreach(double value, double lowerLimit, double upperLimit);
+void classifyTemperatureBreach(std::unordered_map <int, std::pair<int, int>> &tempBreach);
+
 void checkAndAlert(
   AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC);
 
+void sendBatteryTempStatus(AlertTarget alertTarget, BreachType breachType, std::ostream& os = std::cout, const char* recepientId = "a.b@c.com");
+
+/*
 void sendToController(BreachType breachType);
 void sendToEmail(BreachType breachType);
+*/
+
+#endif //TYPEWISE_ALERT_H_
